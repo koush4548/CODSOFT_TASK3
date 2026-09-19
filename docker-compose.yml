@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # Emerald Transit - Web & API Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: emerald_bus_app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgresql://postgres:emeraldpass@postgres:5432/emerald_transit
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # PostgreSQL - ACID Transactional Ledger
+  postgres:
+    image: postgres:16-alpine
+    container_name: emerald_bus_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: emeraldpass
+      POSTGRES_DB: emerald_transit
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis - Distributed Redlock Mutex Manager
+  redis:
+    image: redis:7-alpine
+    container_name: emerald_bus_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+  redisdata:

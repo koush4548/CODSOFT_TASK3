@@ -1,0 +1,6 @@
+{
+  "name": "Emerald Transit - Cloud Bus Reservation System",
+  "description": "A scalable cloud-based bus ticket reservation system featuring interactive 2x2 seat selection, ACID booking transactions with distributed locking, PNR lookup, printable digital boarding passes, and cloud-ready container architecture.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
